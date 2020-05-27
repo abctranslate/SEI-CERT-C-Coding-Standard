@@ -19,6 +19,8 @@ For these reasons, it is important to ensure that operations on signed integers 
 
 Integer operations will overflow if the resulting value cannot be represented by the underlying representation of the integer. The following table indicates which operations can result in overflow.
 
+如果整数的运算结果无法用底层二进制数表示(underlying representation)，整数就会溢出。下表列出了可能造成溢出的操作：
+
 | Operator | Overflow | Operator | Overflow | Operator  | Overflow | Operator | Overflow |
 | :------- | :------- | :------- | :------- | :-------- | :------- | :------- | :------- |
 | `+`      | Yes      | `-=`     | Yes      | `<<`      | Yes      | `<`      | No       |
@@ -33,42 +35,79 @@ Integer operations will overflow if the resulting value cannot be represented by
 
 The following sections examine specific operations that are susceptible to integer overflow. When operating on integer types with less precision than `int`, integer promotions are applied. The usual arithmetic conversions may also be applied to (implicitly) convert operands to equivalent types before arithmetic operations are performed. Programmers should understand integer conversion rules before trying to implement secure arithmetic operations. (See [INT02-C. Understand integer conversion rules](https://wiki.sei.cmu.edu/confluence/display/c/INT02-C.+Understand+integer+conversion+rules).)
 
+下面具体分析一下容易造成整数溢出的操作。如果参与整型运算的数据类型精度比`int` 类型低，它的类型就会被提升为`int`。如果运算符两边的操作数类型不同，在算数运算之前，通常会隐式转换为相同类型。程序员在拉出安全的运算代码前，有必要了解一下整数类型转换规则。(See [INT02-C. Understand integer conversion rules](https://wiki.sei.cmu.edu/confluence/display/c/INT02-C.+Understand+integer+conversion+rules).)
+
+
+
 ## Implementation Details
+
+## 实施细节(Implementation Details)
 
 GNU GCC invoked with the `-fwrapv` command-line option defines the same modulo arithmetic for both unsigned and signed integers.
 
+GNU GCC 的`-fwrapv`参数：把无符号整数和有符号整数的取模运算定义为相同的运算。
+
 GNU GCC invoked with the `-ftrapv` command-line option causes a trap to be generated when a signed integer overflows, which will most likely abnormally exit. On a UNIX system, the result of such an event may be a signal sent to the process.
+
+GNU GCC 的`-ftrapv`参数：有符号整数溢出时，产生一个异常信息，可能使系统异常退出。在 UNIX 环境中，可能产生一个信号并发送给进程。
 
 GNU GCC invoked without either the `-fwrapv` or the `-ftrapv` option may simply assume that signed integers never overflow and may generate object code accordingly.
 
+GNU GCC 如果不设置`-fwrapv`或`-ftrapv`参数，就会假设无符号整数永远不会溢出。
+
 ## Atomic Integers
+
+## ???原子整数(Atomic Integers)
 
 The C Standard defines the behavior of arithmetic on atomic signed integer types to use two's complement representation with silent wraparound on overflow; there are no undefined results. Although defined, these results may be unexpected and therefore carry similar risks to [unsigned integer wrapping](https://wiki.sei.cmu.edu/confluence/display/c/BB.+Definitions#BB.Definitions-unsignedintegerwrapping). (See [INT30-C. Ensure that unsigned integer operations do not wrap](https://wiki.sei.cmu.edu/confluence/display/c/INT30-C.+Ensure+that+unsigned+integer+operations+do+not+wrap).) Consequently, signed integer overflow of atomic integer types should also be prevented or detected. 
 
-
+C 标准定义原子有符号整数使用二者补码运算，???溢出时没有提示(silent wraparound)；因此结果不会产生 undefined 行为。然而就算这样定义了，这些结果仍然可能不是期望值，因此与 [无符号整数溢出(unsigned integer wrapping)](https://wiki.sei.cmu.edu/confluence/display/c/BB.+Definitions#BB.Definitions-unsignedintegerwrapping) 有类似的风险。(See [INT30-C. Ensure that unsigned integer operations do not wrap](https://wiki.sei.cmu.edu/confluence/display/c/INT30-C.+Ensure+that+unsigned+integer+operations+do+not+wrap).) 所以仍然有必要防止或检测原子整数的溢出。
 
 
 
 ## Addition
 
+## 加法
+
 Addition is between two operands of arithmetic type or between a pointer to an object type and an integer type. This rule applies only to addition between two operands of arithmetic type. (See [ARR37-C. Do not add or subtract an integer to a pointer to a non-array object](https://wiki.sei.cmu.edu/confluence/display/c/ARR37-C.+Do+not+add+or+subtract+an+integer+to+a+pointer+to+a+non-array+object) and [ARR30-C. Do not form or use out-of-bounds pointers or array subscripts](https://wiki.sei.cmu.edu/confluence/display/c/ARR30-C.+Do+not+form+or+use+out-of-bounds+pointers+or+array+subscripts).)
 
 Incrementing is equivalent to adding 1.
 
+加法操作应用于两个算数类型的操作数之间，亦或指针和对象、整数之间。以下的规则仅适用于两个算数类型的操作数的加法操作。 (See [ARR37-C. Do not add or subtract an integer to a pointer to a non-array object](https://wiki.sei.cmu.edu/confluence/display/c/ARR37-C.+Do+not+add+or+subtract+an+integer+to+a+pointer+to+a+non-array+object) and [ARR30-C. Do not form or use out-of-bounds pointers or array subscripts](https://wiki.sei.cmu.edu/confluence/display/c/ARR30-C.+Do+not+form+or+use+out-of-bounds+pointers+or+array+subscripts).)
+
+自增运算相当于 +1
+
 ### Noncompliant Code Example
+
+### 新手行为(Noncompliant Code Example)
 
 This noncompliant code example can result in a signed integer overflow during the addition of the signed operands `si_a` and `si_b`:
 
-```
-void func(signed int si_a, signed int si_b) {  signed int sum = si_a + si_b;  /* ... */ }
+新手行为的代码在计算`si_a`和`si_b`的和的时候可能造成整数溢出。
+
+```c
+void func(signed int si_a, signed int si_b) {
+	signed int sum = si_a + si_b; /* ... */
+}
 ```
 
 ### Compliant Solution
 
 This compliant solution ensures that the addition operation cannot overflow, regardless of representation:
 
-```
-#include   void f(signed int si_a, signed int si_b) {  signed int sum;  if (((si_b > 0) && (si_a > (INT_MAX - si_b))) ||      ((si_b < 0) && (si_a < (INT_MIN - si_b)))) {    /* Handle error */  } else {    sum = si_a + si_b;  }  /* ... */ }
+```c
+#include <limits.h>
+
+void f(signed int si_a, signed int si_b) {
+    signed int sum;
+    if (((si_b > 0) && (si_a > (INT_MAX - si_b))) ||
+        ((si_b < 0) && (si_a < (INT_MIN - si_b)))) {
+        /* Handle error */
+    } else {
+        sum = si_a + si_b;
+    }
+    /* ... */
+}
 ```
 
 
