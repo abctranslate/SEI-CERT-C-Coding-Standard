@@ -73,7 +73,7 @@ Addition is between two operands of arithmetic type or between a pointer to an o
 
 Incrementing is equivalent to adding 1.
 
-加法操作应用于两个算数类型的操作数之间，亦或指针和对象、整数之间。以下的规则仅适用于两个算数类型的操作数的加法操作。 (See [ARR37-C. Do not add or subtract an integer to a pointer to a non-array object](https://wiki.sei.cmu.edu/confluence/display/c/ARR37-C.+Do+not+add+or+subtract+an+integer+to+a+pointer+to+a+non-array+object) and [ARR30-C. Do not form or use out-of-bounds pointers or array subscripts](https://wiki.sei.cmu.edu/confluence/display/c/ARR30-C.+Do+not+form+or+use+out-of-bounds+pointers+or+array+subscripts).)
+加法操作应用于两个算数类型的操作数之间，或者指针和对象、整数之间。以下的规则仅适用于两个算数类型的操作数的加法操作。 (See [ARR37-C. Do not add or subtract an integer to a pointer to a non-array object](https://wiki.sei.cmu.edu/confluence/display/c/ARR37-C.+Do+not+add+or+subtract+an+integer+to+a+pointer+to+a+non-array+object) and [ARR30-C. Do not form or use out-of-bounds pointers or array subscripts](https://wiki.sei.cmu.edu/confluence/display/c/ARR30-C.+Do+not+form+or+use+out-of-bounds+pointers+or+array+subscripts).)
 
 自增运算相当于 +1
 
@@ -83,17 +83,22 @@ Incrementing is equivalent to adding 1.
 
 This noncompliant code example can result in a signed integer overflow during the addition of the signed operands `si_a` and `si_b`:
 
-新手行为的代码在计算`si_a`和`si_b`的和的时候可能造成整数溢出。
+这种新手行为的代码，在计算`si_a`和`si_b`的和的时候可能造成整数溢出。
 
 ```c
 void func(signed int si_a, signed int si_b) {
-	signed int sum = si_a + si_b; /* ... */
+	signed int sum = si_a + si_b; 
+    /* ... */
 }
 ```
 
 ### Compliant Solution
 
+### 优秀代码
+
 This compliant solution ensures that the addition operation cannot overflow, regardless of representation:
+
+优秀的代码确保加法操作不会溢出，虽然复杂了些(regardless of representation)：
 
 ```c
 #include <limits.h>
@@ -114,56 +119,156 @@ void f(signed int si_a, signed int si_b) {
 
 ## Subtraction
 
+## 减法
+
 Subtraction is between two operands of arithmetic type, two pointers to qualified or unqualified versions of compatible object types, or a pointer to an object type and an integer type. This rule applies only to subtraction between two operands of arithmetic type. (See [ARR36-C. Do not subtract or compare two pointers that do not refer to the same array](https://wiki.sei.cmu.edu/confluence/display/c/ARR36-C.+Do+not+subtract+or+compare+two+pointers+that+do+not+refer+to+the+same+array), [ARR37-C. Do not add or subtract an integer to a pointer to a non-array object](https://wiki.sei.cmu.edu/confluence/display/c/ARR37-C.+Do+not+add+or+subtract+an+integer+to+a+pointer+to+a+non-array+object), and [ARR30-C. Do not form or use out-of-bounds pointers or array subscripts](https://wiki.sei.cmu.edu/confluence/display/c/ARR30-C.+Do+not+form+or+use+out-of-bounds+pointers+or+array+subscripts) for information about pointer subtraction.)
 
 Decrementing is equivalent to subtracting 1.
 
+减法操作应用于两个算数类型的操作数之间，???或者指向同类型对象的两个指针之间(two pointers to qualified or unqualified versions of compatible object types)。以下的规则仅适用于两个算数类型的操作数的减法操作。(See [ARR36-C. Do not subtract or compare two pointers that do not refer to the same array](https://wiki.sei.cmu.edu/confluence/display/c/ARR36-C.+Do+not+subtract+or+compare+two+pointers+that+do+not+refer+to+the+same+array), [ARR37-C. Do not add or subtract an integer to a pointer to a non-array object](https://wiki.sei.cmu.edu/confluence/display/c/ARR37-C.+Do+not+add+or+subtract+an+integer+to+a+pointer+to+a+non-array+object), and [ARR30-C. Do not form or use out-of-bounds pointers or array subscripts](https://wiki.sei.cmu.edu/confluence/display/c/ARR30-C.+Do+not+form+or+use+out-of-bounds+pointers+or+array+subscripts) for information about pointer subtraction.)
+
+自减运算相当于 -1
+
 ### Noncompliant Code Example
+
+### 新手行为
 
 This noncompliant code example can result in a signed integer overflow during the subtraction of the signed operands `si_a` and `si_b`:
 
-```
-void func(signed int si_a, signed int si_b) {  signed int diff = si_a - si_b;  /* ... */ }
+这种新手行为的代码，在计算`si_a`和`si_b`的差的时候可能造成整数溢出。
+
+```c
+void func(signed int si_a, signed int si_b) {
+    signed int diff = si_a - si_b;
+    /* ... */
+}
 ```
 
 ### Compliant Solution
 
+### 优秀代码
+
 This compliant solution tests the operands of the subtraction to guarantee there is no possibility of signed overflow, regardless of representation:
 
-```
-#include   void func(signed int si_a, signed int si_b) {  signed int diff;  if ((si_b > 0 && si_a < INT_MIN + si_b) ||      (si_b < 0 && si_a > INT_MAX + si_b)) {    /* Handle error */  } else {    diff = si_a - si_b;  }   /* ... */ }
+优秀的代码确保减法操作不会溢出，虽然复杂了些：
+
+```c
+#include <limits.h>
+
+void func(signed int si_a, signed int si_b) {
+    signed int diff;
+    if ((si_b > 0 && si_a < INT_MIN + si_b) ||
+        (si_b < 0 && si_a > INT_MAX + si_b)) {
+        /* Handle error */
+    } else {
+        diff = si_a - si_b;
+    }
+    /* ... */
+}
 ```
 
 
 
 ## Multiplication
 
+## 乘法
+
 Multiplication is between two operands of arithmetic type.
+
+乘法操作应用于两个算数类型的操作数之间。
 
 ### Noncompliant Code Example
 
+### 新手行为
+
 This noncompliant code example can result in a signed integer overflow during the multiplication of the signed operands `si_a` and `si_b`:
 
-```
-void func(signed int si_a, signed int si_b) {  signed int result = si_a * si_b;  /* ... */ }
+这种新手行为的代码，在计算`si_a`和`si_b`的积的时候可能造成整数溢出。
+
+```c
+void func(signed int si_a, signed int si_b) {
+    signed int result = si_a * si_b;
+    /* ... */
+}
 ```
 
 ### Compliant Solution
 
+### 优秀代码
+
 The product of two operands can always be represented using twice the number of bits than exist in the precision of the larger of the two operands. This compliant solution eliminates signed overflow on systems where `long long` is at least twice the precision of `int`:
 
-```
-#include  #include  #include  #include   extern size_t popcount(uintmax_t); #define PRECISION(umax_value) popcount(umax_value)    void func(signed int si_a, signed int si_b) {  signed int result;  signed long long tmp;  assert(PRECISION(ULLONG_MAX) >= 2 * PRECISION(UINT_MAX));  tmp = (signed long long)si_a * (signed long long)si_b;   /*   * If the product cannot be represented as a 32-bit integer,   * handle as an error condition.   */  if ((tmp > INT_MAX) || (tmp < INT_MIN)) {    /* Handle error */  } else {    result = (int)tmp;  }  /* ... */ }
+两数的积可以用较大操作数有效二进制位数的两倍表示。优秀的代码限制整数溢出，前提条件是系统的`long long`类型长度至少是`int`长度的 2 倍。
+
+```c
+#include <assert.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <stddef.h>
+
+extern size_t popcount(uintmax_t);
+#define PRECISION(umax_value) popcount(umax_value)
+
+void func(signed int si_a, signed int si_b) {
+    signed int result;
+    signed long long tmp;
+    assert(PRECISION(ULLONG_MAX) >= 2 * PRECISION(UINT_MAX));
+    tmp = (signed long long)si_a * (signed long long)si_b;
+
+    /*
+   * If the product cannot be represented as a 32-bit integer,
+   * handle as an error condition.
+   */
+    if ((tmp > INT_MAX) || (tmp < INT_MIN)) {
+        /* Handle error */
+    } else {
+        result = (int)tmp;
+    }
+    /* ... */
+}
 ```
 
 The assertion fails if `long long` has less than twice the precision of `int`. The `PRECISION()` macro and `popcount()` function provide the correct precision for any integer type. (See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).) 
 
+如果`long long`类型的长度小于`int`类型长度的 2 倍，`assert`断言语句抛出异常。`PRECISION()`宏和`popcount()`函数获取任意整数二进制位长度。(See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).) 
+
 ### Compliant Solution
+
+### 优秀代码
 
 The following portable compliant solution can be used with any conforming implementation, including those that do not have an integer type that is at least twice the precision of `int`:
 
-```
-#include   void func(signed int si_a, signed int si_b) {  signed int result;    if (si_a > 0) {  /* si_a is positive */    if (si_b > 0) {  /* si_a and si_b are positive */      if (si_a > (INT_MAX / si_b)) {        /* Handle error */      }    } else { /* si_a positive, si_b nonpositive */      if (si_b < (INT_MIN / si_a)) {        /* Handle error */      }    } /* si_a positive, si_b nonpositive */  } else { /* si_a is nonpositive */    if (si_b > 0) { /* si_a is nonpositive, si_b is positive */      if (si_a < (INT_MIN / si_b)) {        /* Handle error */      }    } else { /* si_a and si_b are nonpositive */      if ( (si_a != 0) && (si_b < (INT_MAX / si_a))) {        /* Handle error */      }    } /* End if si_a and si_b are nonpositive */  } /* End if si_a is nonpositive */   result = si_a * si_b; }
+以下代码为兼容方案，兼容任意标准，适用于没有 2 倍`int`长度数据类型的系统。
+
+```c
+#include <limits.h>
+
+void func(signed int si_a, signed int si_b) {
+    signed int result;
+    if (si_a > 0) {     /* si_a is positive */
+        if (si_b > 0) { /* si_a and si_b are positive */
+            if (si_a > (INT_MAX / si_b)) {
+                /* Handle error */
+            }
+        } else { /* si_a positive, si_b nonpositive */
+            if (si_b < (INT_MIN / si_a)) {
+                /* Handle error */
+            }
+        }               /* si_a positive, si_b nonpositive */
+    } else {            /* si_a is nonpositive */
+        if (si_b > 0) { /* si_a is nonpositive, si_b is positive */
+            if (si_a < (INT_MIN / si_b)) {
+                /* Handle error */
+            }
+        } else { /* si_a and si_b are nonpositive */
+            if ((si_a != 0) && (si_b < (INT_MAX / si_a))) {
+                /* Handle error */
+            }
+        } /* End if si_a and si_b are nonpositive */
+    }     /* End if si_a is nonpositive */
+
+    result = si_a * si_b;
+}
 ```
 
 
