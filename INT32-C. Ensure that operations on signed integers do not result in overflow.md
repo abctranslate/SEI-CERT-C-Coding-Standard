@@ -94,7 +94,7 @@ void func(signed int si_a, signed int si_b) {
 
 ### Compliant Solution
 
-### 优秀代码
+### 规范代码
 
 This compliant solution ensures that the addition operation cannot overflow, regardless of representation:
 
@@ -146,7 +146,7 @@ void func(signed int si_a, signed int si_b) {
 
 ### Compliant Solution
 
-### 优秀代码
+### 规范代码
 
 This compliant solution tests the operands of the subtraction to guarantee there is no possibility of signed overflow, regardless of representation:
 
@@ -194,7 +194,7 @@ void func(signed int si_a, signed int si_b) {
 
 ### Compliant Solution
 
-### 优秀代码
+### 规范代码
 
 The product of two operands can always be represented using twice the number of bits than exist in the precision of the larger of the two operands. This compliant solution eliminates signed overflow on systems where `long long` is at least twice the precision of `int`:
 
@@ -234,7 +234,7 @@ The assertion fails if `long long` has less than twice the precision of `int`. T
 
 ### Compliant Solution
 
-### 优秀代码
+### 规范代码
 
 The following portable compliant solution can be used with any conforming implementation, including those that do not have an integer type that is at least twice the precision of `int`:
 
@@ -275,104 +275,264 @@ void func(signed int si_a, signed int si_b) {
 
 ## Division
 
+## 除法
+
 Division is between two operands of arithmetic type. Overflow can occur during two's complement signed integer division when the dividend is equal to the minimum (negative) value for the signed integer type and the divisor is equal to `−1`. Division operations are also susceptible to divide-by-zero errors. (See [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors).)
+
+除法操作应用于两个算数类型的操作数之间。当被除数等于有符号整数(负的)最小值，除数等于 -1 时，就会溢出。当除数为 0 时除法也会报错。(See [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors).)
 
 ### Noncompliant Code Example
 
+### 新手行为
+
 This noncompliant code example prevents divide-by-zero errors in compliance with [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors) but does not prevent a signed integer overflow error in two's-complement. 
 
-```
-void func(signed long s_a, signed long s_b) {  signed long result;  if (s_b == 0) {    /* Handle error */  } else {   result = s_a / s_b;  }  /* ... */ }
+这段代码检查了除数为 0 的情况  [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors) ， 但是没有检查有符号整数除法溢出的情况。
+
+```c
+void func(signed long s_a, signed long s_b) {
+    signed long result;
+    if (s_b == 0) {
+        /* Handle error */  
+    } else {
+        result = s_a / s_b;  
+    }
+    /* ... */ 
+}
 ```
 
 ### Implementation Details
 
+### 实现细节
+
 On the x86-32 architecture, overflow results in a fault, which can be exploited as a [denial-of-service attack](https://wiki.sei.cmu.edu/confluence/display/c/BB.+Definitions#BB.Definitions-denial-of-service).
+
+在 x86-32 环境下，溢出会导致错误，可能会被 DOS 攻击([denial-of-service attack](https://wiki.sei.cmu.edu/confluence/display/c/BB.+Definitions#BB.Definitions-denial-of-service))钻空子。
 
 ### Compliant Solution
 
+### 规范代码
+
 This compliant solution eliminates the possibility of divide-by-zero errors or signed overflow:
 
-```
-#include   void func(signed long s_a, signed long s_b) {  signed long result;  if ((s_b == 0) || ((s_a == LONG_MIN) && (s_b == -1))) {    /* Handle error */  } else {    result = s_a / s_b;  }  /* ... */ }
+下面的代码是规范的实现，避免了除数为 0 的错误和整数溢出。
+
+```c
+#include <limits.h>
+  
+void func(signed long s_a, signed long s_b) {
+  signed long result;
+  if ((s_b == 0) || ((s_a == LONG_MIN) && (s_b == -1))) {
+    /* Handle error */
+  } else {
+    result = s_a / s_b;
+  }
+  /* ... */
+}
 ```
 
 ## Remainder
+<<<<<<< HEAD
 其他部分
+=======
+
+## 取余
+
+>>>>>>> continue...
 The remainder operator provides the remainder when two operands of integer type are divided. Because many platforms implement remainder and division in the same instruction, the remainder operator is also susceptible to arithmetic overflow and division by zero. (See [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors).)
 当两个整数类型的操作数被除时，余数运算符提供余数。因为许多平台在同一条指令中实现了余数和除法，所以余数运算符也容易受到算术溢出和被零除的影响。
 
+取余运算符获取 2 个操作数相除的余数。很多平台用同一套指令实现取余和除法，所以取余运算符也要注意除数为 0 和整数溢出的问题。(See [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors).)
+
 ### Noncompliant Code Example
+<<<<<<< HEAD
 不合规代码示例
 Many hardware architectures implement remainder as part of the division operator, which can overflow. Overflow can occur during a remainder operation when the dividend is equal to the minimum (negative) value for the signed integer type and the divisor is equal to −1. It occurs even though the result of such a remainder operation is mathematically 0. This noncompliant code example prevents divide-by-zero errors in compliance with [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors) but does not prevent integer overflow:
 许多硬件架构实现的余数作为除法运算符的一部分，可能会溢出。
 ```
 void func(signed long s_a, signed long s_b) {  signed long result;  if (s_b == 0) {    /* Handle error */  } else {    result = s_a % s_b;  }  /* ... */ }
+=======
+
+### 新手行为
+
+Many hardware architectures implement remainder as part of the division operator, which can overflow. Overflow can occur during a remainder operation when the dividend is equal to the minimum (negative) value for the signed integer type and the divisor is equal to −1. It occurs even though the result of such a remainder operation is mathematically 0. This noncompliant code example prevents divide-by-zero errors in compliance with [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors) but does not prevent integer overflow:
+
+很多硬件平台把取余操作当成除法运算的一部分，所以取余也会溢出。当被除数等于有符号整数(负的)最小值，除数等于 -1 时，就会溢出。而且就算余数为 0 ，也可能溢出。下面的代码检查了除数为 0 的情况  [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors) ， 但是没有检查有符号整数除法溢出的情况。
+
+```c
+void func(signed long s_a, signed long s_b) {
+  signed long result;
+  if (s_b == 0) {
+    /* Handle error */
+  } else {
+    result = s_a % s_b;
+  }
+  /* ... */
+}
+>>>>>>> continue...
 ```
 
 ### Implementation Details
 
+### 实现细节
+
 On x86-32 platforms, the remainder operator for signed integers is implemented by the `idiv` instruction code, along with the divide operator. Because `LONG_MIN / −1` overflows, it results in a software exception with `LONG_MIN % −1` as well.
+
+在 x86-32 平台上，有符号整数的取余运算符和除法运算符都用`idiv`指令实现。因为 `LONG_MIN / −1` 会溢出，所以 `LONG_MIN % −1` 也会抛出异常。
 
 ### Compliant Solution
 
+### 规范代码
+
 This compliant solution also tests the remainder operands to guarantee there is no possibility of an overflow:
 
-```
-#include   void func(signed long s_a, signed long s_b) {  signed long result;  if ((s_b == 0 ) || ((s_a == LONG_MIN) && (s_b == -1))) {    /* Handle error */  } else {    result = s_a % s_b;  }    /* ... */ }
+下面的代码是规范的实现，避免了除数为 0 的错误和整数溢出。
+
+```c
+#include <limits.h>
+  
+void func(signed long s_a, signed long s_b) {
+  signed long result;
+  if ((s_b == 0 ) || ((s_a == LONG_MIN) && (s_b == -1))) {
+    /* Handle error */
+  } else {
+    result = s_a % s_b;
+  } 
+  /* ... */
+}
 ```
 
 
 
 ## Left-Shift Operator
 
+## 左移运算符
+
 The left-shift operator takes two integer operands. The result of `E1 << E2` is `E1` left-shifted `E2` bit positions; vacated bits are filled with zeros. 
+
+左移运算符需要 2 个操作数。`E1 << E2`代表`E1`向左移动`E2`个二进制位；空位补零。
 
 The C Standard, 6.5.7, paragraph 4 [[ISO/IEC 9899:2011](https://wiki.sei.cmu.edu/confluence/display/c/AA.+Bibliography#AA.Bibliography-ISO-IEC9899-2011)], states
 
+C 标准 6.5.7，第 4 段 [[ISO/IEC 9899:2011](https://wiki.sei.cmu.edu/confluence/display/c/AA.+Bibliography#AA.Bibliography-ISO-IEC9899-2011)]：
+
 > If `E1` has a signed type and nonnegative value, and `E1 × 2E2` is representable in the result type, then that is the resulting value; otherwise, the behavior is undefined.
+>
+> 如果`E1`是有符号非负整数，且结果可以用`E1 × 2E2`表示，则其为运算结果；否则该操作为 undefined 行为。
 
 In almost every case, an attempt to shift by a negative number of bits or by more bits than exist in the operand indicates a logic error. These issues are covered by [INT34-C. Do not shift an expression by a negative number of bits or by greater than or equal to the number of bits that exist in the operand](https://wiki.sei.cmu.edu/confluence/display/c/INT34-C.+Do+not+shift+an+expression+by+a+negative+number+of+bits+or+by+greater+than+or+equal+to+the+number+of+bits+that+exist+in+the+operand).
 
+几乎任何情况下，移动负数个二进制位或者移动的位数超过操作数上限，都会产生逻辑错误。详细内容参考 [INT34-C. Do not shift an expression by a negative number of bits or by greater than or equal to the number of bits that exist in the operand](https://wiki.sei.cmu.edu/confluence/display/c/INT34-C.+Do+not+shift+an+expression+by+a+negative+number+of+bits+or+by+greater+than+or+equal+to+the+number+of+bits+that+exist+in+the+operand)。
+
 ### Noncompliant Code Example
+
+### 新手行为
 
 This noncompliant code example performs a left shift, after verifying that the number being shifted is not negative, and the number of bits to shift is valid.  The `PRECISION()` macro and `popcount()` function provide the correct precision for any integer type. (See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).) However, because this code does no overflow check, it can result in an unrepresentable value. 
 
-```
-#include  #include  #include   extern size_t popcount(uintmax_t); #define PRECISION(umax_value) popcount(umax_value)  void func(signed long si_a, signed long si_b) {  signed long result;  if ((si_a < 0) || (si_b < 0) ||      (si_b >= PRECISION(ULONG_MAX)) {    /* Handle error */  } else {    result = si_a << si_b;  }   /* ... */ }
+下面是一个左移操作的例子，确定了被移动数非负，移动数有效。`PRECISION()` 宏和`popcount()`函数获得所有整数的位数。 (See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).) 然而，这段代码没有做溢出检查，所以还是可能得到预期以外的结果。
+
+```c
+#include <limits.h>
+#include <stddef.h>
+#include <inttypes.h>
+  
+extern size_t popcount(uintmax_t);
+#define PRECISION(umax_value) popcount(umax_value)
+ 
+void func(signed long si_a, signed long si_b) {
+  signed long result;
+  if ((si_a < 0) || (si_b < 0) ||
+      (si_b >= PRECISION(ULONG_MAX)) {
+    /* Handle error */
+  } else {
+    result = si_a << si_b;
+  }
+  /* ... */
+}
 ```
 
 ### Compliant Solution
 
+### 规范代码
+
 This compliant solution eliminates the possibility of overflow resulting from a left-shift operation:
 
-```
-#include  #include  #include   extern size_t popcount(uintmax_t); #define PRECISION(umax_value) popcount(umax_value)  void func(signed long si_a, signed long si_b) {  signed long result;  if ((si_a < 0) || (si_b < 0) ||      (si_b >= PRECISION(ULONG_MAX)) ||      (si_a > (LONG_MAX >> si_b))) {    /* Handle error */  } else {    result = si_a << si_b;  }   /* ... */ }
+下面的代码是规范的实现，确保了左移操作不会溢出。
+
+```c
+#include <limits.h>
+#include <stddef.h>
+#include <inttypes.h>
+  
+extern size_t popcount(uintmax_t);
+#define PRECISION(umax_value) popcount(umax_value)
+ 
+void func(signed long si_a, signed long si_b) {
+  signed long result;
+  if ((si_a < 0) || (si_b < 0) ||
+      (si_b >= PRECISION(ULONG_MAX)) ||
+      (si_a > (LONG_MAX >> si_b))) {
+    /* Handle error */
+  } else {
+    result = si_a << si_b;
+  }
+  /* ... */
+}
 ```
 
 ## Unary Negation
 
+## 一元运算符
+
 The unary negation operator takes an operand of arithmetic type. Overflow can occur during two's complement unary negation when the operand is equal to the minimum (negative) value for the signed integer type.
+
+一元运算符需要 1 个算数类型的操作数。当操作数是有符号整数(负的)最小值的时候，一元运算就会溢出。
 
 ### Noncompliant Code Example
 
+### 新手行为
+
 This noncompliant code example can result in a signed integer overflow during the unary negation of the signed operand `s_a`:
 
-```
-void func(signed long s_a) {  signed long result = -s_a;  /* ... */ }
+下面的代码取`s_a`的负值，可能导致整数溢出。
+
+```c
+void func(signed long s_a) {
+  signed long result = -s_a;
+  /* ... */
+}
 ```
 
 ### Compliant Solution
 
+### 规范代码
+
 This compliant solution tests the negation operation to guarantee there is no possibility of signed overflow:
 
-```
-#include   void func(signed long s_a) {  signed long result;  if (s_a == LONG_MIN) {    /* Handle error */  } else {    result = -s_a;  }  /* ... */ } 
+下面的代码是规范的实现，保证不会溢出：
+
+```c
+#include <limits.h>
+  
+void func(signed long s_a) {
+  signed long result;
+  if (s_a == LONG_MIN) {
+    /* Handle error */
+  } else {
+    result = -s_a;
+  }
+  /* ... */
+}
 ```
 
 Risk Assessment
 
+风险评估
+
 Integer overflow can lead to buffer overflows and the execution of arbitrary code by an attacker.
+
+整数溢出可能导致缓冲区溢出，执行黑客的任意代码。
 
 | Rule    | Severity | Likelihood | Remediation Cost | Priority | Level  |
 | :------ | :------- | :--------- | :--------------- | :------- | :----- |
