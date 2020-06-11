@@ -332,26 +332,14 @@ void func(signed long s_a, signed long s_b) {
 ```
 
 ## Remainder
-<<<<<<< HEAD
-其他部分
-=======
 
 ## 取余
 
->>>>>>> continue...
 The remainder operator provides the remainder when two operands of integer type are divided. Because many platforms implement remainder and division in the same instruction, the remainder operator is also susceptible to arithmetic overflow and division by zero. (See [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors).)
-当两个整数类型的操作数被除时，余数运算符提供余数。因为许多平台在同一条指令中实现了余数和除法，所以余数运算符也容易受到算术溢出和被零除的影响。
 
 取余运算符获取 2 个操作数相除的余数。很多平台用同一套指令实现取余和除法，所以取余运算符也要注意除数为 0 和整数溢出的问题。(See [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors).)
 
 ### Noncompliant Code Example
-<<<<<<< HEAD
-不合规代码示例
-Many hardware architectures implement remainder as part of the division operator, which can overflow. Overflow can occur during a remainder operation when the dividend is equal to the minimum (negative) value for the signed integer type and the divisor is equal to −1. It occurs even though the result of such a remainder operation is mathematically 0. This noncompliant code example prevents divide-by-zero errors in compliance with [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors) but does not prevent integer overflow:
-许多硬件架构实现的余数作为除法运算符的一部分，可能会溢出。
-```
-void func(signed long s_a, signed long s_b) {  signed long result;  if (s_b == 0) {    /* Handle error */  } else {    result = s_a % s_b;  }  /* ... */ }
-=======
 
 ### 新手行为
 
@@ -369,7 +357,6 @@ void func(signed long s_a, signed long s_b) {
   }
   /* ... */
 }
->>>>>>> continue...
 ```
 
 ### Implementation Details
@@ -401,7 +388,6 @@ void func(signed long s_a, signed long s_b) {
   /* ... */
 }
 ```
-
 
 
 ## Left-Shift Operator
