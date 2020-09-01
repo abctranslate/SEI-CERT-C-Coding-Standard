@@ -1,4 +1,5 @@
- 
+> Rule 04. Integers (INT)
+> INT32-C. Ensure that operations on signed integers do not result in overflow
 
 Signed integer overflow is [undefined behavior 36](https://wiki.sei.cmu.edu/confluence/display/c/BB.+Definitions#BB.Definitions-undefinedbehavior). Consequently, [implementations](https://wiki.sei.cmu.edu/confluence/display/c/BB.+Definitions#BB.Definitions-implementation) have considerable latitude in how they deal with signed integer overflow. (See [MSC15-C. Do not depend on undefined behavior](https://wiki.sei.cmu.edu/confluence/display/c/MSC15-C.+Do+not+depend+on+undefined+behavior).) An implementation that defines signed integer types as being modulo, for example, need not detect integer overflow. Implementations may also trap on signed arithmetic overflows, or simply assume that overflows will never happen and generate object code accordingly.  It is also possible for the same conforming implementation to emit code that exhibits different behavior in different contexts. For example, an implementation may determine that a signed integer loop control variable declared in a local scope cannot overflow and may emit efficient code on the basis of that determination, while the same implementation may determine that a global variable used in a similar context will wrap.
 
@@ -59,7 +60,7 @@ GNU GCC 如果不设置`-fwrapv`或`-ftrapv`参数，就会假设无符号整数
 
 ## ???原子整数(Atomic Integers)
 
-The C Standard defines the behavior of arithmetic on atomic signed integer types to use two's complement representation with silent wraparound on overflow; there are no undefined results. Although defined, these results may be unexpected and therefore carry similar risks to [unsigned integer wrapping](https://wiki.sei.cmu.edu/confluence/display/c/BB.+Definitions#BB.Definitions-unsignedintegerwrapping). (See [INT30-C. Ensure that unsigned integer operations do not wrap](https://wiki.sei.cmu.edu/confluence/display/c/INT30-C.+Ensure+that+unsigned+integer+operations+do+not+wrap).) Consequently, signed integer overflow of atomic integer types should also be prevented or detected. 
+The C Standard defines the behavior of arithmetic on atomic signed integer types to use two's complement representation with silent wraparound on overflow; there are no undefined results. Although defined, these results may be unexpected and therefore carry similar risks to [unsigned integer wrapping](https://wiki.sei.cmu.edu/confluence/display/c/BB.+Definitions#BB.Definitions-unsignedintegerwrapping). (See [INT30-C. Ensure that unsigned integer operations do not wrap](https://wiki.sei.cmu.edu/confluence/display/c/INT30-C.+Ensure+that+unsigned+integer+operations+do+not+wrap).) Consequently, signed integer overflow of atomic integer types should also be prevented or detected.
 
 C 标准定义原子有符号整数使用二者补码运算，???溢出时没有提示(silent wraparound)；因此结果不会产生 undefined 行为。然而就算这样定义了，这些结果仍然可能不是期望值，因此与 [无符号整数溢出(unsigned integer wrapping)](https://wiki.sei.cmu.edu/confluence/display/c/BB.+Definitions#BB.Definitions-unsignedintegerwrapping) 有类似的风险。(See [INT30-C. Ensure that unsigned integer operations do not wrap](https://wiki.sei.cmu.edu/confluence/display/c/INT30-C.+Ensure+that+unsigned+integer+operations+do+not+wrap).) 所以仍然有必要防止或检测原子整数的溢出。
 
@@ -87,7 +88,7 @@ This noncompliant code example can result in a signed integer overflow during th
 
 ```c
 void func(signed int si_a, signed int si_b) {
-	signed int sum = si_a + si_b; 
+	signed int sum = si_a + si_b;
     /* ... */
 }
 ```
@@ -228,9 +229,9 @@ void func(signed int si_a, signed int si_b) {
 }
 ```
 
-The assertion fails if `long long` has less than twice the precision of `int`. The `PRECISION()` macro and `popcount()` function provide the correct precision for any integer type. (See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).) 
+The assertion fails if `long long` has less than twice the precision of `int`. The `PRECISION()` macro and `popcount()` function provide the correct precision for any integer type. (See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).)
 
-如果`long long`类型的长度小于`int`类型长度的 2 倍，`assert`断言语句抛出异常。`PRECISION()`宏和`popcount()`函数获取任意整数二进制位长度。(See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).) 
+如果`long long`类型的长度小于`int`类型长度的 2 倍，`assert`断言语句抛出异常。`PRECISION()`宏和`popcount()`函数获取任意整数二进制位长度。(See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).)
 
 ### Compliant Solution
 
@@ -285,7 +286,7 @@ Division is between two operands of arithmetic type. Overflow can occur during t
 
 ### 新手行为
 
-This noncompliant code example prevents divide-by-zero errors in compliance with [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors) but does not prevent a signed integer overflow error in two's-complement. 
+This noncompliant code example prevents divide-by-zero errors in compliance with [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors) but does not prevent a signed integer overflow error in two's-complement.
 
 这段代码检查了除数为 0 的情况  [INT33-C. Ensure that division and remainder operations do not result in divide-by-zero errors](https://wiki.sei.cmu.edu/confluence/display/c/INT33-C.+Ensure+that+division+and+remainder+operations+do+not+result+in+divide-by-zero+errors) ， 但是没有检查有符号整数除法溢出的情况。
 
@@ -297,7 +298,7 @@ void func(signed long s_a, signed long s_b) {
     } else {
         result = s_a / s_b;  
     }
-    /* ... */ 
+    /* ... */
 }
 ```
 
@@ -319,7 +320,7 @@ This compliant solution eliminates the possibility of divide-by-zero errors or s
 
 ```c
 #include <limits.h>
-  
+
 void func(signed long s_a, signed long s_b) {
   signed long result;
   if ((s_b == 0) || ((s_a == LONG_MIN) && (s_b == -1))) {
@@ -377,14 +378,14 @@ This compliant solution also tests the remainder operands to guarantee there is 
 
 ```c
 #include <limits.h>
-  
+
 void func(signed long s_a, signed long s_b) {
   signed long result;
   if ((s_b == 0 ) || ((s_a == LONG_MIN) && (s_b == -1))) {
     /* Handle error */
   } else {
     result = s_a % s_b;
-  } 
+  }
   /* ... */
 }
 ```
@@ -394,7 +395,7 @@ void func(signed long s_a, signed long s_b) {
 
 ## 左移运算符
 
-The left-shift operator takes two integer operands. The result of `E1 << E2` is `E1` left-shifted `E2` bit positions; vacated bits are filled with zeros. 
+The left-shift operator takes two integer operands. The result of `E1 << E2` is `E1` left-shifted `E2` bit positions; vacated bits are filled with zeros.
 
 左移运算符需要 2 个操作数。`E1 << E2`代表`E1`向左移动`E2`个二进制位；空位补零。
 
@@ -414,7 +415,7 @@ In almost every case, an attempt to shift by a negative number of bits or by mor
 
 ### 新手行为
 
-This noncompliant code example performs a left shift, after verifying that the number being shifted is not negative, and the number of bits to shift is valid.  The `PRECISION()` macro and `popcount()` function provide the correct precision for any integer type. (See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).) However, because this code does no overflow check, it can result in an unrepresentable value. 
+This noncompliant code example performs a left shift, after verifying that the number being shifted is not negative, and the number of bits to shift is valid.  The `PRECISION()` macro and `popcount()` function provide the correct precision for any integer type. (See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).) However, because this code does no overflow check, it can result in an unrepresentable value.
 
 下面是一个左移操作的例子，确定了被移动数非负，移动数有效。`PRECISION()` 宏和`popcount()`函数获得所有整数的位数。 (See [INT35-C. Use correct integer precisions](https://wiki.sei.cmu.edu/confluence/display/c/INT35-C.+Use+correct+integer+precisions).) 然而，这段代码没有做溢出检查，所以还是可能得到预期以外的结果。
 
@@ -422,10 +423,10 @@ This noncompliant code example performs a left shift, after verifying that the n
 #include <limits.h>
 #include <stddef.h>
 #include <inttypes.h>
-  
+
 extern size_t popcount(uintmax_t);
 #define PRECISION(umax_value) popcount(umax_value)
- 
+
 void func(signed long si_a, signed long si_b) {
   signed long result;
   if ((si_a < 0) || (si_b < 0) ||
@@ -450,10 +451,10 @@ This compliant solution eliminates the possibility of overflow resulting from a 
 #include <limits.h>
 #include <stddef.h>
 #include <inttypes.h>
-  
+
 extern size_t popcount(uintmax_t);
 #define PRECISION(umax_value) popcount(umax_value)
- 
+
 void func(signed long si_a, signed long si_b) {
   signed long result;
   if ((si_a < 0) || (si_b < 0) ||
@@ -500,7 +501,7 @@ This compliant solution tests the negation operation to guarantee there is no po
 
 ```c
 #include <limits.h>
-  
+
 void func(signed long s_a) {
   signed long result;
   if (s_a == LONG_MIN) {
@@ -640,5 +641,3 @@ INT32-C – CWE-190 =
 ------
 
 [![SEI CERT C Coding Standard > SEI CERT C Coding Standard > button_arrow_left.png](https://wiki.sei.cmu.edu/confluence/download/attachments/87152044/button_arrow_left.png?version=1&modificationDate=1201021124000&api=v2)](https://wiki.sei.cmu.edu/confluence/pages/viewpage.action?pageId=87152211) [![SEI CERT C Coding Standard > SEI CERT C Coding Standard > button_arrow_up.png](https://wiki.sei.cmu.edu/confluence/download/attachments/87152044/button_arrow_up.png?version=1&modificationDate=1201021146000&api=v2)](https://wiki.sei.cmu.edu/confluence/pages/viewpage.action?pageId=87152052) [![SEI CERT C Coding Standard > SEI CERT C Coding Standard > button_arrow_right.png](https://wiki.sei.cmu.edu/confluence/download/attachments/87152044/button_arrow_right.png?version=1&modificationDate=1201021137000&api=v2)](https://wiki.sei.cmu.edu/confluence/pages/viewpage.action?pageId=87152254)
-
- 
