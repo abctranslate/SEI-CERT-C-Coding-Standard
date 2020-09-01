@@ -11,3 +11,5 @@
 ## Contents
 
 [Rule04.INT32](2_Rules/Rules04_INT/INT32-C.%20Ensure%20that%20operations%20on%20signed%20integers%20do%20not%20result%20in%20overflow.md)
+
+Go on
