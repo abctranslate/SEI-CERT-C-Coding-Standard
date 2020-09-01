@@ -7,3 +7,5 @@
 - 不确定的地方用 ??? 标记，方便之后校对
 
 祝你生活愉快，****，谢谢 :-)
+
+[Rule04.INT32](".\2_Rules\Rules04_INT\INT32-C. Ensure that operations on signed integers do not result in overflow.md")
