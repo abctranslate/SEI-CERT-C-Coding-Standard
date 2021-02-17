@@ -12,4 +12,8 @@
 
 [Rule04.INT32](2_Rules/Rules04_INT/INT32-C.%20Ensure%20that%20operations%20on%20signed%20integers%20do%20not%20result%20in%20overflow.md)
 
-Go on
+[The Joel Test: 12 Steps to Better Code](Joel谈软件/The_Joel_Test-12_Steps_to_Better_Code.md)
+
+<!-- 经测试，路径空格用%20代替可行 -->
+
+To be continued...
